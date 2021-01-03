@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+<!--
+properties:
+        当需要引入外部配置文件的时候，可以使用这样的方式，类似于<context:property-placeholder location>
+        resource:表示从当前项目的类路径中进行加载，如果用的是idea指的是resource资源目录下的配置文件
+        url:可以从当前文件系统的磁盘目录查找配置，也可以从网络上的资源进行引入
+    -->
+    <properties resource="data.properties"></properties>
+    <typeAliases>
+        <package name="com.mashibing"></package>
+    </typeAliases>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+<!--                连接数据库的参数，如果是连接池可以设置其他参数，比如最大连接数-->
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <package name="com.mashibing"></package>
+    </mappers>
+</configuration>

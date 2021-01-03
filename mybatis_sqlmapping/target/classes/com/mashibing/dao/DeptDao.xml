@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.dao.DeptDao">
+
+    <resultMap id="deptMap" type="dept">
+
+        <id property="deptno" column="deptno"></id>
+        <result property="dname" column="dname"></result>
+        <result property="loc" column="loc"></result>
+        <collection property="emp" ofType="com.mashibing.bean.Emp">
+            <id property="empno" column="empno"></id>
+            <result property="ename" column="ename"></result>
+            <result property="job" column="job"></result>
+            <result property="mgr" column="mgr"></result>
+            <result property="hireDate" column="hiredate"></result>
+            <result property="sal" column="sal"></result>
+            <result property="comm" column="comm"></result>
+            <result property="deptNo" column="deptno"></result>
+        </collection>
+    </resultMap>
+
+    <select id="selectDeptAndEmpByDeptno" resultMap="deptMap">
+        select * from dept left join emp on emp.deptno = dept.deptno where dept.deptno = ${deptno}
+    </select>
+
+    <select id="selectDeptByDeptno" resultType="dept">
+        select * from dept where deptno=#{deptno}
+    </select>
+
+    <resultMap id="deptMap2" type="dept">
+
+        <id property="deptno" column="deptno"></id>
+        <result property="dname" column="dname"></result>
+        <result property="loc" column="loc"></result>
+        <collection property="emp" ofType="com.mashibing.bean.Emp" select="com.mashibing.dao.EmpDao.selectEmpByStep2" column="deptno" fetchType="lazy">
+        </collection>
+    </resultMap>
+    <select id="selectDeptByDeptno2" resultMap="deptMap2">
+        select * from dept where deptno=#{deptno}
+    </select>
+</mapper>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.dao.EmpDao">
+
+    <resultMap id="empMap" type="emp">
+        <id property="empno" column="empno"></id>
+        <result property="ename" column="ename"></result>
+        <result property="job" column="job"></result>
+        <result property="mgr" column="mgr"></result>
+        <result property="hireDate" column="hiredate"></result>
+        <result property="sal" column="sal"></result>
+        <result property="comm" column="comm"></result>
+        <result property="deptNo" column="deptno"></result>
+        <result property="dept.deptno" column="deptno"></result>
+        <result property="dept.dname" column="dname"></result>
+        <result property="dept.loc" column="loc"></result>
+
+    </resultMap>
+    <resultMap id="empMap2" type="emp">
+        <id property="empno" column="empno"></id>
+        <result property="ename" column="ename"></result>
+        <result property="job" column="job"></result>
+        <result property="mgr" column="mgr"></result>
+        <result property="hireDate" column="hiredate"></result>
+        <result property="sal" column="sal"></result>
+        <result property="comm" column="comm"></result>
+        <result property="deptNo" column="deptno"></result>
+        <association property="dept" javaType="com.mashibing.bean.Dept">
+            <result property="deptno" column="deptno"></result>
+            <result property="dname" column="dname"></result>
+            <result property="loc" column="loc"></result>
+        </association>
+
+
+    </resultMap>
+
+<!--
+         select emp.ename,emp.empno from emp left join dept on emp.deptno = dept.deptno where empno = ${empno}
+         结果：Emp{empno=7369, ename='SMITH', job='null', mgr='null', hireDate=null, sal=0.0, comm=0.0, deptNo='null', dept=null}
+         不需要打印的就是null
+
+         select * from emp left join dept on emp.deptno = dept.deptno where empno = ${empno}
+         结果：Emp{empno=7369, ename='SMITH', job='CLERK', mgr='7902', hireDate=Wed Dec 17 08:00:00 CST 1980, sal=800.0, comm=0.0, deptNo='20', dept=Dept{deptno=20, dname='RESEARCH', loc='DALLAS'}}
+         需要所有的信息，就会全部打印
+
+
+-->
+    
+    <resultMap id="empMap3" type="emp">
+        <id property="empno" column="empno"></id>
+        <result property="ename" column="ename"></result>
+        <result property="job" column="job"></result>
+        <result property="mgr" column="mgr"></result>
+        <result property="hireDate" column="hiredate"></result>
+        <result property="sal" column="sal"></result>
+        <result property="comm" column="comm"></result>
+        <result property="deptNo" column="deptno"></result>
+        <association property="dept" select="com.mashibing.dao.DeptDao.selectDeptByDeptno" column="deptno"></association>
+    </resultMap>
+    
+    <select id="selectEmpAndDeptByEmpno" resultMap="empMap2">
+        select * from emp left join dept on emp.deptno = dept.deptno where empno = ${empno}
+    </select>
+    <select id="selectEmpByStep" resultMap="empMap3">
+        select * from emp where empno=#{empno}
+    </select>
+
+    <select id="selectEmpByStep2" resultMap="empMap3">
+        select * from emp where empno=#{empno}
+    </select>
+
+    <!--<sql id=""></sql>-->
+
+    <select id="selectEmpByCondition" resultMap="empMap2">
+        select * from emp
+       <!-- <where>
+            <if test="empno!=null">
+                empno > #{empno}
+            </if>
+            <if test="ename!=null">
+                and ename=#{ename}
+            </if>
+        </where>-->
+       <where>
+           <choose>
+               <when test="empno!=null">
+                   empno = #{empno}
+               </when>
+               <when test="ename!=null">
+                   ename=#{ename}
+               </when>
+               <otherwise>
+                   1=1
+               </otherwise>
+           </choose>
+       </where>
+    </select>
+<!--
+        foreach:遍历集合中的元素
+            colloction
+-->
+    <select id="selectEmpByDeptnos" resultType="com.mashibing.bean.Emp">
+        select * from emp where deptno in
+        <foreach collection="deptnos" separator="," open="(" item="deptno" index="index" close=")">
+            #{deptno}
+        </foreach>
+    </select>
+    <update id="updateEmp" parameterType="com.mashibing.bean.Emp">
+        update emp set ename=#{ename} where empno = #{empno}
+    </update>
+    <!--
+           一级缓存是默认开启的，
+           二级缓存设置：<cache/> 开启二级缓存后，一级缓存就失效了
+
+           二级缓存可以包含多个数据值：
+           eviction：缓存淘汰机制
+           LRU：最近最少使用  默认
+           FIFO:先进先出，按照添加缓存的顺序执行
+           SOFT:软引用
+           WEAK：弱引用
+
+           flushInterval（刷新间隔）属性可以被设置为任意的正整数，设置的值应该是一个以毫秒为单位的合理时间量。 默认情况是不设置，也就是没有刷新间隔，缓存仅仅会在调用语句时刷新。
+           size（引用数目）属性可以被设置为任意正整数，要注意欲缓存对象的大小和运行环境中可用的内存资源。默认值是 1024。
+
+           readOnly（只读）属性可以被设置为 true 或 false。只读的缓存会给所有调用者返回缓存对象的相同实例。
+                        因此这些对象不能被修改。这就提供了可观的性能提升。而可读写的缓存会（通过序列化）返回缓存对象的拷贝。
+                        速度上会慢一些，但是更安全，因此默认值是 false。
+           一级缓存和二级缓存是否同时存在数据？
+            不会，因为二级缓存是在sqlsession关闭之后才生效
+           当查询数据的时候，我们是先查询一级缓存还是二级缓存？
+            先查询二级缓存，在查询一级缓存
+           只有在二级缓存才打印命中率
+
+
+   -->
+<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+
+</mapper>
