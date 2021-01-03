@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.dao.EmpDao">
+<!--
+        flushCache:将其设置为 true 后，只要语句被调用，都会导致本地缓存和二级缓存被清空，默认值：（对 insert、update 和 delete 语句）true。
+        statementType:可选
+                STATEMENT:最基本的jdbc操作，用来表示一个sql语句，不能防止sql注入
+                PREPARED：PreparedStatement 采用预编译的方式，能够防止sql注入，设置参数时候需要该对象进行设置
+                CALLABLE：CallableStatement 调用存储过程
+                      默认值：PREPARED。
+        useGeneratedKeys：（仅适用于 insert 和 update）这会令 MyBatis 使用 JDBC 的 getGeneratedKeys
+                             方法来取出由数据库内部生成的主键（比如：像 MySQL 和 SQL Server 这样的关系型数据库管理系统的自动递增字段），
+                             默认值：false。
+                             useGeneratedKeys="true"  完成插入操作的时候，可以将自增生成的主键值返回到具体的对象
+                             keyProperty="id"  指定但会的住建要赋值到哪个属性中
+        resultType	期望从这条语句中返回结果的类全限定名或别名。
+                    注意，如果返回的是集合，那应该设置为集合包含的类型，而不是集合本身的类型。
+                    resultType 和 resultMap 之间只能同时使用一个。
+        resultMap	对外部 resultMap 的命名引用。如果返回对象中包含另一个对象的引用
+                    结果映射是 MyBatis 最强大的特性，如果你对其理解透彻，许多复杂的映射问题都能迎刃而解。
+                    resultType 和 resultMap 之间只能同时使用一个。
+             参数获取值得方式：
+                    每次在向sql中设置结果值的时候，可以使用#{},还可以使用${}这样的方式，那么哪种比较好？
+                    #{}:select * from emp where empno = ？
+                    ${}：select * from emp where empno = 7369
+                    通过sql语句可以得出结论：
+                        #{}的处理方式是使用了参数预编译的方式，不会引起sql注入的问题
+                        ${}的处理方式是直接拼接sql语句，得到对应的sql语句，会有sql注入的危险
+                        但是${}也是有使用场景的：当需要传递多个参数，比如，传递表名
+
+                        1、如果是一个参数
+                                基本数据类型：可与使用#{}随便获取
+                                引用数据类型：使用#{}必须使用对象的属性名
+                        2、如果是多个参数
+                                不可以使用#{}来获取了，只能通过arg0，arg1，param1，param2...的方式来获取
+                                原因在于，mybatis在传入多个参数的时候，会将这些参数结果封装到map结构中，在map中key值就是(arg0，arg1...param1，param2)
+                                这种方式很不友好,所以使用在参数上添加@param的方式：
+                                public List<Emp> selectEmpByEmpnoandSal(@Param("empno") int empno, @Param("sal") double sal);
+                        3、自定义map结构
+
+-->
+<!--    使用${}获取表名-->
+    <select id="selectEmpByEmpnoandTableName" resultType="emp" databaseId="mysql">
+    select * from ${arg0} where empno = #{arg1}
+  </select>
+    <select id="selectEmpByEmpno" resultType="emp" databaseId="mysql">
+    select * from emp where empno = #{empno}
+  </select>
+    <select id="selectEmpByEmpno" resultType="emp" databaseId="oracle">
+    select * from emp where empno = #{empno}
+  </select>
+<!--    多个参数-->
+    <select id="selectEmpByEmpnoandSal" resultType="emp" databaseId="mysql">
+    select * from emp where empno = #{empno} and sal>#{sal}
+  </select>
+    <select id="selectEmpByEmpnoandSal3" resultType="emp" databaseId="mysql">
+    select * from emp where empno = #{empno} and sal>#{sal}
+  </select>
+
+<!--当返回结果是map结构的时候，会把查询的结果的字段值作为key，结果作为value-->
+    <select id="selectEmpByEmpnoReturnMap" resultType="map" databaseId="mysql">
+    select * from emp where empno = #{empno}
+  </select>
+
+    <select id="selectAll2" resultType="emp">
+        select * from emp;
+    </select>
+
+    <select id="selectAll" resultType="emp">
+        select * from emp;
+    </select>
+
+
+
+
+<insert id="save" parameterType="com.mashibing.bean.Emp">
+        insert into emp(empno,ename) values(#{empno},#{ename})
+    </insert>
+    <delete id="delete" parameterType="java.lang.Integer">
+        delete from emp where empno=#{empno}
+    </delete>
+    <update id="update" parameterType="com.mashibing.bean.Emp">
+        update emp set ename=#{ename} where empno = #{empno}
+    </update>
+
+<!--    ========================================================================================-->
+<!--    -->
+</mapper>

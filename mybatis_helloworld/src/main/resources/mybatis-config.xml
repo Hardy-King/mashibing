@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+<!--
+properties:
+        当需要引入外部配置文件的时候，可以使用这样的方式，类似于<context:property-placeholder location>
+        resource:表示从当前项目的类路径中进行加载，如果用的是idea指的是resource资源目录下的配置文件
+        url:可以从当前文件系统的磁盘目录查找配置，也可以从网络上的资源进行引入
+    -->
+    <properties resource="data.properties"></properties>
+
+<!--
+mapUnderscoreToCamelCase	是否开启驼峰命名自动映射，即从经典数据库列名 A_COLUMN 映射到经典 Java 属性名 aColumn。	true | false	False
+下面是没有开启：
+    DEBUG [main] - ==>  Preparing: select * from user where id = ?
+DEBUG [main] - ==> Parameters: 1(Integer)
+TRACE [main] - <==    Columns: id, user_name
+TRACE [main] - <==        Row: 1, zhangsan
+DEBUG [main] - <==      Total: 1
+User{id=1, userName='null'}
+-->
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+
+    <typeAliases>
+       <!-- <typeAlias type="com.mashibing.bean.Emp" alias="emp"></typeAlias>-->
+        <package name="com.mashibing.bean"/>
+    </typeAliases>
+<!--    设置定义自己的类型处理器，mybatis中默认内置了很多处理器，一般不需要自己处理-->
+   <!-- <typeHandlers>
+        <typeHandler handler=""></typeHandler>
+        <package name=""/>
+    </typeHandlers>-->
+
+
+<!--    当需要自定义对象工厂的时候需要此标签，一般不需要自己处理-->
+   <!-- <objectFactory type=""></objectFactory>-->
+<!--
+    environments default="development"
+    选择环境 id就是实际的环境配置
+-->
+    <environments default="development">
+        <environment id="development">
+<!--
+            事务管理器，每一种数据源都需要配置具体的事务管理器
+            type:表示事务管理器的类型
+            jdbc:使用jdbc原生的事务控制
+            managed：什么都没有做
+-->
+            <transactionManager type="JDBC"/>
+<!--            配置具体的数据源的类型
+                type：表示数据源的类型
+                pooled：使用数据库连接池
+                unpooled：每次都打开换个关闭一个连接
+                -->
+            <dataSource type="POOLED">
+<!--                连接数据库的参数，如果是连接池可以设置其他参数，比如最大连接数-->
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <!--    数据库移植性
+                当有数据库一直的需求的时候，可以根据不同的数据库执行不同的sql语句来扩展数据库的移植性
+    -->
+    <databaseIdProvider type="DB_VENDOR">
+        <property name="MySQL" value="mysql"/>
+        <property name="SQL Server" value="sqlserver"/>
+        <property name="Oracle" value="oracle"/>
+    </databaseIdProvider>
+
+<!--    将mapper映射文件引入到配置文件中，方便程序启动的时候加载
+        每次在进行填写的时候需要注意，写完xml映射之后一定要添加到mybatis-config文件中
+        resource:从项目的类路径下加载对一个的映射文件
+        url：从本地磁盘目录或者网络中引入映射文件
+        class：可以直接引入完全限定名，注解的方式进行使用
+                如果不想以注解的方式引入呢？
+                        1如果想要class的方式引入配置文件，可以将xml文件添加到类的同级目录下
+
+                        如果是maven操作需要在maven文件中添加如下：因为maven只加载java文件
+                        <build>
+    <resources>
+        <resource>
+            <directory>src/main/java</directory>
+            <includes>
+                <include>**/**.xml</include>
+            </includes>
+        </resource>
+    </resources>
+</build>
+2.第二种方法是，在resources中创建跟UserDao.java相同的包名(是包package不是文件夹，需要先创建文件夹，在设置，make directory as...)
+        -->
+    <mappers>
+<!--        <mapper resource="EmpDao.xml"/>-->
+       <!-- <mapper resource="UserDao.xml"></mapper>-->
+<!--        <mapper class="com.mashibing.dao.UserDaoAnno"></mapper>-->
+<!--        <mapper class="com.mashibing.dao.UserDao"></mapper>-->
+<!--        如果需要引入多个目录，需要使用package-->
+        <package name="com.mashibing.dao"/>
+    </mappers>
+</configuration>

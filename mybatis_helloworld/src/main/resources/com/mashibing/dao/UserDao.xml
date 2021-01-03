@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.dao.UserDao">
+    <select id="findUserById" resultType="com.mashibing.bean.User">
+    select * from user where id = #{id}
+  </select>
+
+<!--
+         flushCache:将其设置为 true 后，只要语句被调用，都会导致本地缓存和二级缓存被清空，默认值：（对 insert、update 和 delete 语句）true。
+        statementType:可选
+                STATEMENT:最基本的jdbc操作，用来表示一个sql语句，不能防止sql注入
+                PREPARED：PreparedStatement 采用预编译的方式，能够防止sql注入，设置参数时候需要该对象进行设置
+                CALLABLE：CallableStatement 调用存储过程
+                      默认值：PREPARED。
+        useGeneratedKeys：（仅适用于 insert 和 update）这会令 MyBatis 使用 JDBC 的 getGeneratedKeys
+                             方法来取出由数据库内部生成的主键（比如：像 MySQL 和 SQL Server 这样的关系型数据库管理系统的自动递增字段），
+                             默认值：false。
+                             useGeneratedKeys="true"  完成插入操作的时候，可以将自增生成的主键值返回到具体的对象
+                             keyProperty="id"  指定但会的住建要赋值到哪个属性中
+
+-->
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+    insert into user(user_name) values(#{userName})
+</insert>
+    <select id="selectAll" resultType="user">
+        select * from user;
+    </select>
+
+</mapper>
