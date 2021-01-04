@@ -21,7 +21,7 @@ public class SSMController {
 
     }
     @RequestMapping("/test2")
-    public String test2(Model model){
+    public String test2(Model model){ 
         System.out.println("test2");
         Emp emp = empDao.selectEmpAndDeptByEmpno(7369);
         model.addAttribute("emp",emp);

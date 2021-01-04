@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Built-By: goodking
 Created-By: IntelliJ IDEA
-Build-Jdk: 1.8.0_144
+Built-By: goodking
+Build-Jdk: version 1.8.0_144
 
